@@ -1,0 +1,10 @@
+---
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+const content = Astro.locals.stacks.get(name);
+---
+
+<Fragment set:html={content} />

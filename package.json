@@ -1,0 +1,35 @@
+{
+  "name": "astro-stacks",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Laravel Blade-style @stack/@push system for Astro SSR",
+  "keywords": ["astro", "ssr", "stacks", "push", "middleware"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Livog/astro-stacks.git"
+  },
+  "author": "Livog",
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./stack-output.astro": "./dist/stack-output.astro"
+  },
+  "files": ["dist"],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc && cp src/*.astro dist/",
+    "clean": "rm -rf dist",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
