@@ -8,7 +8,7 @@ A Laravel Blade-style `@stack` / `@push` / `@pushOnce` system for Astro SSR. Let
 >
 > If a response contains no placeholders, it passes through untouched — no buffering, no overhead.
 >
-> In practice, this tradeoff is acceptable for most Astro SSR apps: Astro's island architecture means interactivity comes from client-side hydration, not from streaming the initial HTML faster.
+> In practice, this tradeoff is acceptable for most Astro projects: marketing sites and regular websites rarely need streaming, and Astro Islands are not affected since they hydrate on the client via separate fetch requests after the initial HTML is delivered.
 
 ## The Problem
 
