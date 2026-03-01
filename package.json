@@ -1,9 +1,16 @@
 {
   "name": "astro-stacks",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Laravel Blade-style @stack/@push system for Astro SSR",
-  "keywords": ["astro", "astro-integration", "ssr", "stacks", "push", "middleware"],
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "ssr",
+    "stacks",
+    "push",
+    "middleware"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,7 +28,9 @@
     "./stack.astro": "./dist/stack.astro",
     "./middleware": "./dist/middleware.ts"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
@@ -37,5 +46,7 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
-  "workspaces": ["demo"]
+  "workspaces": [
+    "demo"
+  ]
 }
