@@ -34,7 +34,7 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc && cp src/*.astro dist/ && cp src/middleware.ts dist/",
+    "build": "tsup && tsc --emitDeclarationOnly && cp src/*.astro dist/ && cp src/middleware.ts dist/",
     "clean": "rm -rf dist",
     "test": "vitest run"
   },
@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "astro": "^6.0.0-beta.17",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },

@@ -44,15 +44,24 @@ export default defineConfig({
 });
 ```
 
-### Type Declarations
+### Typed Stack Names
+
+Types are auto-injected by the integration — no manual `env.d.ts` needed. The integration scans your `.astro` files for `<Stack name="..." />` usage and generates typed stack names, giving you autocomplete on `push`, `pushOnce`, `get`, and `has`.
+
+You can also declare additional stack names via the `stacks` config option:
 
 ```ts
-// src/env.d.ts
-/// <reference types="astro/client" />
+export default defineConfig({
+  integrations: [astroStacks({ stacks: ["head", "beforeBodyEnd"] })],
+});
+```
 
-declare namespace App {
-  interface Locals {
-    stacks: import("astro-stacks").StackStore;
+Other integrations (or your own code) can augment `StackNames` via declaration merging:
+
+```ts
+declare module "astro-stacks" {
+  interface StackNames {
+    "myCustomStack": true;
   }
 }
 ```
@@ -206,6 +215,6 @@ The preconnect appears in `<head>` and the script appears at end of `<body>`, bo
 
 | Export Path | Contents |
 |---|---|
-| `astro-stacks` | `createStackStore`, `renderStacks`, `renderStacksResponse`, `StackStore` type, integration default export |
+| `astro-stacks` | `createStackStore`, `renderStacks`, `renderStacksResponse`, `StackStore` / `StackNames` / `StackName` types, integration default export |
 | `astro-stacks/stack.astro` | `Stack` component |
 | `astro-stacks/middleware` | Middleware (auto-registered by integration) |

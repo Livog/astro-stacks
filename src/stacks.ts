@@ -1,10 +1,23 @@
+export interface StackNames {}
+
+export type StackName = keyof StackNames extends never
+  ? string
+  : Extract<keyof StackNames, string> | (string & {});
+
+export interface StackStore {
+  push(stack: StackName, content: string): void;
+  pushOnce(stack: StackName, key: string, content: string): void;
+  get(stack: StackName): string;
+  has(stack: StackName): boolean;
+}
+
 interface StackEntry {
   items: string[];
   once: Set<string>;
   joined: string | null;
 }
 
-export function createStackStore() {
+export function createStackStore(): StackStore {
   const stacks: Record<string, StackEntry> = Object.create(null);
 
   function ensure(stack: string): StackEntry {
@@ -38,8 +51,6 @@ export function createStackStore() {
     },
   };
 }
-
-export type StackStore = ReturnType<typeof createStackStore>;
 
 const STACK_PLACEHOLDER = /<!--@stack\(([^)]+)\)-->/g;
 
