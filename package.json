@@ -1,6 +1,6 @@
 {
   "name": "astro-stacks",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "Laravel Blade-style @stack/@push system for Astro SSR",
   "keywords": [
