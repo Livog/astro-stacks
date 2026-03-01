@@ -1,0 +1,21 @@
+---
+import Icon from "astro-icon-sprite/icon.astro";
+import SearchBar from "./SearchBar.astro";
+---
+
+<nav class="flex items-center gap-1 border-b border-zinc-800/80 pb-4 mb-10">
+  <a href="/" class="text-sm font-medium text-zinc-50 px-3 py-1.5 rounded-md hover:bg-zinc-800/60 transition-colors">
+    Home
+  </a>
+  <a href="/" class="group inline-flex items-center gap-1 text-sm text-zinc-400 px-3 py-1.5 rounded-md hover:bg-zinc-800/60 hover:text-zinc-100 transition-colors">
+    About
+    <Icon name="chevron-down" class="size-3.5 opacity-40 group-hover:opacity-70 transition-opacity" />
+  </a>
+  <a href="/" class="group inline-flex items-center gap-1 text-sm text-zinc-400 px-3 py-1.5 rounded-md hover:bg-zinc-800/60 hover:text-zinc-100 transition-colors">
+    Services
+    <Icon name="chevron-down" class="size-3.5 opacity-40 group-hover:opacity-70 transition-opacity" />
+  </a>
+  <div class="ml-auto">
+    <SearchBar />
+  </div>
+</nav>

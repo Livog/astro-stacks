@@ -1,2 +1,3 @@
-export { createStackStore, renderStacks, renderStacksResponse, stacksMiddleware } from "./stacks.js";
-export type { StackStore } from "./stacks.js";
+export { createStackStore, renderStacks, renderStacksResponse } from "./stacks";
+export type { StackStore } from "./stacks";
+export { default } from "./integration";

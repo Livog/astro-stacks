@@ -47,17 +47,6 @@ export function renderStacks(html: string, store: StackStore): string {
   return html.replace(STACK_PLACEHOLDER, (_, name) => store.get(name));
 }
 
-export function stacksMiddleware() {
-  return async (
-    context: { locals: { stacks: StackStore } },
-    next: () => Promise<Response>,
-  ): Promise<Response> => {
-    context.locals.stacks = createStackStore();
-    const response = await next();
-    return renderStacksResponse(response, context.locals.stacks);
-  };
-}
-
 export async function renderStacksResponse(
   response: Response,
   store: StackStore,

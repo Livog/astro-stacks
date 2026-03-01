@@ -1,0 +1,38 @@
+---
+import Icon from "astro-icon-sprite/icon.astro";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+Astro.locals.stacks.pushOnce(
+  "beforeBodyEnd",
+  "accordion-js",
+  `<script>
+    document.querySelectorAll('[data-accordion]').forEach(el => {
+      el.querySelector('[data-accordion-trigger]')?.addEventListener('click', () => {
+        el.classList.toggle('open');
+      });
+    });
+  </script>`,
+);
+---
+
+<div data-accordion class="group rounded-xl border border-zinc-800/80 bg-zinc-900/40 overflow-hidden">
+  <button
+    data-accordion-trigger
+    class="flex w-full items-center justify-between p-4 text-left cursor-pointer hover:bg-zinc-800/30 transition-colors"
+  >
+    <h3 class="text-sm font-semibold text-zinc-100">{title}</h3>
+    <Icon name="chevron-down" class="size-4 text-zinc-500 transition-transform duration-200 group-[.open]:rotate-180" />
+  </button>
+  <div class="grid grid-rows-[0fr] group-[.open]:grid-rows-[1fr] transition-[grid-template-rows] duration-200">
+    <div class="overflow-hidden">
+      <div class="px-4 pb-4 text-sm text-zinc-400 leading-relaxed">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>

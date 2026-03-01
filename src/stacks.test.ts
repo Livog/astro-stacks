@@ -195,7 +195,7 @@ describe("renderStacks", () => {
     expect(headSection).toContain('<script type="application/ld+json">{"@type":"WebPage"}</script>');
   });
 
-  it("works alongside inline StackOutput content", () => {
+  it("works alongside inline Stack content", () => {
     const store = createStackStore();
     store.push("head", '<link rel="preload" href="/font.woff2" as="font">');
     store.pushOnce("beforeBodyEnd", "accordion-js", "<script>/* accordion */</script>");

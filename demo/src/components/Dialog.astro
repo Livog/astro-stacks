@@ -1,0 +1,43 @@
+---
+import Icon from "astro-icon-sprite/icon.astro";
+
+Astro.locals.stacks.pushOnce(
+  "beforeBodyEnd",
+  "dialog-js",
+  `<script>
+    document.querySelectorAll('[data-dialog-open]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.dialogOpen);
+        target?.showModal();
+      });
+    });
+    document.querySelectorAll('[data-dialog-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('dialog')?.close();
+      });
+    });
+  </script>`,
+);
+---
+
+<dialog
+  id="demo-dialog"
+  class="backdrop:bg-black/60 backdrop:backdrop-blur-sm bg-zinc-900 border border-zinc-800 rounded-xl p-0 max-w-md w-full text-zinc-100 shadow-2xl"
+>
+  <div class="flex items-center justify-between p-5 border-b border-zinc-800">
+    <h3 class="text-sm font-semibold">Dialog Title</h3>
+    <button data-dialog-close class="p-1 rounded-md text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800 transition-colors cursor-pointer">
+      <Icon name="close" class="size-4" />
+    </button>
+  </div>
+  <div class="p-5 text-sm text-zinc-400 leading-relaxed">
+    This dialog's close icon and script were both pushed from deep in the component tree.
+  </div>
+</dialog>
+
+<button
+  data-dialog-open="demo-dialog"
+  class="inline-flex items-center gap-2 text-sm font-medium text-zinc-100 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600 transition-all duration-200 cursor-pointer"
+>
+  Open Dialog
+</button>

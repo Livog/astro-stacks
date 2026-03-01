@@ -1,0 +1,170 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+import Card from "../components/Card.astro";
+import Accordion from "../components/Accordion.astro";
+import Dialog from "../components/Dialog.astro";
+import Icon from "astro-icon-sprite/icon.astro";
+
+Astro.locals.stacks.push(
+  "head",
+  `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Astro Stacks Demo"}</script>`,
+);
+---
+
+<Layout title="Astro Stacks">
+  <Nav />
+
+  <!-- Hero -->
+  <div class="mb-14">
+    <div class="inline-flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 rounded-full px-3 py-1 mb-5">
+      <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      Experimental
+    </div>
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-50 mb-3">
+      @stack / @push / @pushonce
+    </h1>
+    <p class="text-base text-zinc-400 leading-relaxed max-w-xl">
+      Laravel Blade's stack system, rebuilt for Astro SSR. SVG icons are deduplicated
+      into a single sprite sheet — pushed from deeply nested components, collected at render time.
+    </p>
+  </div>
+
+  <!-- Cards -->
+  <section class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">Cards</h2>
+      <div class="flex-1 h-px bg-zinc-800/80"></div>
+      <span class="text-xs text-zinc-600 font-mono">arrow-right</span>
+    </div>
+    <div class="space-y-3">
+      <Card title="First Card">
+        <p>This card has an arrow-right icon in its button.</p>
+      </Card>
+      <Card title="Second Card">
+        <p>Same icon, but only one sprite definition is pushed via <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">pushOnce</code> dedup.</p>
+      </Card>
+      <Card title="Third Card">
+        <p>Three cards, three <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">&lt;use&gt;</code> refs — one sprite.</p>
+      </Card>
+    </div>
+  </section>
+
+  <!-- Accordions -->
+  <section class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">Accordions</h2>
+      <div class="flex-1 h-px bg-zinc-800/80"></div>
+      <span class="text-xs text-zinc-600 font-mono">chevron-down</span>
+    </div>
+    <div class="space-y-3">
+      <Accordion title="How does this work?">
+        Components call <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">stacks.pushOnce()</code> during
+        rendering. The <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">Stack</code> component placed
+        after the slot collects and emits all pushed content.
+      </Accordion>
+      <Accordion title="What about deduplication?">
+        <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">pushOnce</code> uses a per-stack Set keyed by
+        unique key. Even though <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">chevron-down</code> appears
+        in both the Nav and these accordions, only one sprite is emitted.
+      </Accordion>
+    </div>
+  </section>
+
+  <!-- Dialog -->
+  <section class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">Dialog</h2>
+      <div class="flex-1 h-px bg-zinc-800/80"></div>
+      <span class="text-xs text-zinc-600 font-mono">close</span>
+    </div>
+    <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-5">
+      <p class="text-sm text-zinc-400 mb-4 leading-relaxed">
+        Icons and scripts pushed from deeply nested components. The close icon
+        and dialog JS are both injected via the stacks system.
+      </p>
+      <Dialog />
+    </div>
+  </section>
+
+  <!-- Icon showcase -->
+  <section class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">Icon Registry</h2>
+      <div class="flex-1 h-px bg-zinc-800/80"></div>
+      <span class="text-xs text-zinc-600 font-mono">virtual:icon-registry</span>
+    </div>
+
+    <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/40 overflow-hidden">
+      <!-- Local icons -->
+      <div class="p-5 border-b border-zinc-800/60">
+        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">Local — src/icons/</p>
+        <div class="grid grid-cols-4 gap-3">
+          {["search", "close", "arrow-right", "chevron-down"].map((name) => (
+            <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-zinc-800/30 border border-zinc-800/50 hover:border-zinc-700/60 hover:bg-zinc-800/50 transition-all">
+              <Icon name={name} class="size-5 text-zinc-300" />
+              <span class="text-[11px] font-mono text-zinc-500">{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Lucide icons -->
+      <div class="p-5">
+        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-1">Lucide — lu: prefix</p>
+        <p class="text-xs text-zinc-600 mb-4">Resolved from <code class="font-mono text-zinc-500">node_modules/lucide-static/icons/</code> — only used icons are bundled.</p>
+        <div class="grid grid-cols-4 gap-3">
+          {["lu:house", "lu:x", "lu:layers", "lu:sparkles", "lu:code", "lu:terminal", "lu:zap", "lu:globe"].map((name) => (
+            <div class="flex flex-col items-center gap-2 p-3 rounded-lg bg-zinc-800/30 border border-zinc-800/50 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all group">
+              <Icon name={name} class="size-5 text-zinc-300 group-hover:text-emerald-400 transition-colors" />
+              <span class="text-[11px] font-mono text-zinc-500 group-hover:text-emerald-400/70 transition-colors">{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dedup proof -->
+  <section class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500">Deduplication</h2>
+      <div class="flex-1 h-px bg-zinc-800/80"></div>
+    </div>
+
+    <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-5">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <Icon name="search" class="size-4 text-zinc-400" />
+          <p class="text-sm text-zinc-400">
+            <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">search</code>
+            used in Nav + here — one sprite definition.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <Icon name="close" class="size-4 text-zinc-400" />
+          <p class="text-sm text-zinc-400">
+            <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">close</code>
+            used in Dialog + here — one sprite definition.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <Icon name="lu:house" class="size-4 text-zinc-400" />
+          <p class="text-sm text-zinc-400">
+            <code class="text-emerald-400/80 font-mono text-xs bg-emerald-400/5 px-1.5 py-0.5 rounded">lu:house</code>
+            used in Icon showcase + here — one sprite definition.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-800/80 pt-6 pb-2">
+    <p class="text-xs text-zinc-600 leading-relaxed">
+      View the page source — all SVG symbols are collected into a single <code class="font-mono text-zinc-500">&lt;svg&gt;</code> sprite sheet
+      at the bottom of <code class="font-mono text-zinc-500">&lt;body&gt;</code>. Scripts from Accordion and Dialog
+      appear once each. Structured data is relocated to <code class="font-mono text-zinc-500">&lt;head&gt;</code>.
+    </p>
+  </footer>
+</Layout>

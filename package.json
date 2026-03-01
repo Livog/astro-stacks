@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Laravel Blade-style @stack/@push system for Astro SSR",
-  "keywords": ["astro", "ssr", "stacks", "push", "middleware"],
+  "keywords": ["astro", "astro-integration", "ssr", "stacks", "push", "middleware"],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,18 +18,24 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./stack-output.astro": "./dist/stack-output.astro"
+    "./stack.astro": "./dist/stack.astro",
+    "./middleware": "./dist/middleware.ts"
   },
   "files": ["dist"],
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc && cp src/*.astro dist/",
+    "build": "tsc && cp src/*.astro dist/ && cp src/middleware.ts dist/",
     "clean": "rm -rf dist",
     "test": "vitest run"
   },
+  "peerDependencies": {
+    "astro": ">=4.0.0"
+  },
   "devDependencies": {
+    "astro": "^6.0.0-beta.17",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
-  }
+  },
+  "workspaces": ["demo"]
 }

@@ -4,13 +4,11 @@ A Laravel Blade-style `@stack` / `@push` / `@pushOnce` system for Astro SSR. Let
 
 ## Streaming and Buffering
 
-> **Important tradeoff:** When your layout uses `<!--@stack(name)-->` placeholders (for injecting content into positions _before_ `<slot />`), the middleware **buffers the full HTML response** before sending it to the client. This disables streaming for that request.
+> **Important tradeoff:** The middleware **buffers the full HTML response** to replace `<!--@stack(name)-->` placeholders. This disables streaming for that request.
 >
 > If a response contains no placeholders, it passes through untouched — no buffering, no overhead.
 >
-> In practice, this tradeoff is acceptable for most Astro SSR apps: Astro's island architecture means interactivity comes from client-side hydration, not from streaming the initial HTML faster. The `@astrojs/cloudflare` adapter has historically disabled streaming on Cloudflare Pages anyway.
->
-> **If you only use `StackOutput` (placed after `<slot />`), streaming is fully preserved.** Buffering only kicks in when the HTML contains `<!--@stack(...)-->` comment placeholders.
+> In practice, this tradeoff is acceptable for most Astro SSR apps: Astro's island architecture means interactivity comes from client-side hydration, not from streaming the initial HTML faster.
 
 ## The Problem
 
@@ -18,10 +16,7 @@ In Astro SSR, the HTML stream is generated top-to-bottom. A component's frontmat
 
 This creates a problem: how does a deeply nested child component contribute a `<link rel="preconnect">`, a `<script>`, or structured data to `<head>` — which has already been emitted before the child even runs?
 
-`astro-stacks` solves this with two complementary mechanisms:
-
-- **`StackOutput`** — Reads a stack and emits its content inline. Works for output points that come **after** `<slot />` (e.g. end of `<body>`). No buffering needed.
-- **`<!--@stack(name)-->`** — A placeholder comment that `renderStacksResponse` replaces with the stack content after the full page has rendered. Works for **any** position, including `<head>`. Requires buffering.
+`astro-stacks` solves this with a middleware that buffers the response and replaces `<!--@stack(name)-->` placeholder comments with the collected stack content after the full page has rendered. Use the `<Stack>` component to place these placeholders anywhere in your layout.
 
 ## Installation
 
@@ -31,35 +26,25 @@ bun add astro-stacks
 
 ## Setup
 
-### 1. Middleware
+### Using the Astro Integration (recommended)
 
-Create middleware that initializes the stack store and post-processes the response:
+```bash
+npx astro add astro-stacks
+```
+
+Or manually add to your Astro config:
 
 ```ts
-// src/middleware.ts
-import { defineMiddleware } from "astro:middleware";
-import { createStackStore, renderStacksResponse } from "astro-stacks";
+// astro.config.mjs
+import { defineConfig } from "astro/config";
+import astroStacks from "astro-stacks";
 
-export const onRequest = defineMiddleware(async (context, next) => {
-  context.locals.stacks = createStackStore();
-  const response = await next();
-
-  // Replace <!--@stack(name)--> placeholders in the rendered HTML.
-  // Non-HTML responses and HTML without placeholders pass through untouched.
-  return renderStacksResponse(response, context.locals.stacks);
+export default defineConfig({
+  integrations: [astroStacks()],
 });
 ```
 
-Or use the `stacksMiddleware()` shorthand with `sequence`:
-
-```ts
-import { sequence } from "astro:middleware";
-import { stacksMiddleware } from "astro-stacks";
-
-export const onRequest = sequence(stacksMiddleware(), otherMiddleware);
-```
-
-### 2. Type Declarations
+### Type Declarations
 
 ```ts
 // src/env.d.ts
@@ -72,13 +57,13 @@ declare namespace App {
 }
 ```
 
-### 3. Layout
+### Layout
 
-Use `<!--@stack(name)-->` placeholders for positions before `<slot />`, and `StackOutput` for positions after it:
+Use the `<Stack>` component to place output points in your layout:
 
 ```astro
 ---
-import StackOutput from "astro-stacks/stack-output.astro";
+import Stack from "astro-stacks/stack.astro";
 ---
 
 <!doctype html>
@@ -87,57 +72,20 @@ import StackOutput from "astro-stacks/stack-output.astro";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>My Site</title>
-    <!--@stack(head)-->
+    <Stack name="head" />
   </head>
   <body>
     <slot />
-    <StackOutput name="beforeBodyEnd" />
+    <Stack name="beforeBodyEnd" />
   </body>
 </html>
 ```
 
-## Two Output Modes
-
-### `StackOutput` — After Slot (streaming preserved)
-
-For stacks that appear **after** `<slot />` in the layout. Content is rendered inline during SSR — streaming works normally.
-
-```astro
-<slot />
-<StackOutput name="beforeBodyEnd" />
-```
-
-### `<!--@stack(name)-->` — Anywhere (buffered)
-
-For stacks at **any** position in the document. The placeholder comment is replaced by the middleware after the full page has rendered. **This buffers the response** (see [Streaming and Buffering](#streaming-and-buffering)).
-
-```html
-<head>
-  <!--@stack(head)-->
-</head>
-```
-
-The same placeholder can appear in multiple places — the stack content is not consumed, so every occurrence gets the full content.
-
 ## API Reference
-
-### `stacksMiddleware()`
-
-Returns an Astro middleware handler that:
-
-1. Creates a fresh `StackStore` on `context.locals.stacks`
-2. Calls `next()` to render the page
-3. If the HTML response contains `<!--@stack(...)-->` placeholders, buffers and replaces them
-4. Returns the response (untouched if no placeholders found)
-
-```ts
-import { stacksMiddleware } from "astro-stacks";
-export const onRequest = stacksMiddleware();
-```
 
 ### `createStackStore()`
 
-Creates a new stack store instance. You only need this directly if you're not using `stacksMiddleware()`.
+Creates a new stack store instance. You only need this directly if you're building custom middleware.
 
 ```ts
 import { createStackStore } from "astro-stacks";
@@ -193,7 +141,7 @@ if (store.has("beforeBodyEnd")) { /* ... */ }
 
 ### `renderStacks(html, store)`
 
-Replaces all `<!--@stack(name)-->` placeholders in a string. Low-level — prefer `renderStacksResponse` or `stacksMiddleware`.
+Replaces all `<!--@stack(name)-->` placeholders in a string. Low-level — prefer the integration.
 
 ```ts
 import { renderStacks } from "astro-stacks";
@@ -209,21 +157,21 @@ import { renderStacksResponse } from "astro-stacks";
 const response = await renderStacksResponse(await next(), store);
 ```
 
-### `StackOutput` Component
+### `Stack` Component
 
-Reads a named stack and emits its collected content as raw HTML. Place **after** `<slot />`.
+Emits a `<!--@stack(name)-->` placeholder that the middleware replaces with collected stack content. Works anywhere in your layout.
 
 ```astro
 ---
-import StackOutput from "astro-stacks/stack-output.astro";
+import Stack from "astro-stacks/stack.astro";
 ---
 
-<StackOutput name="beforeBodyEnd" />
+<Stack name="head" />
 ```
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `name` | `string` | The stack to read and emit |
+| `name` | `string` | The stack to output |
 
 ### `StackStore` Type
 
@@ -252,11 +200,12 @@ Astro.locals.stacks.pushOnce(
 </div>
 ```
 
-The preconnect appears in `<head>` via placeholder replacement. The script appears at end of `<body>` via `StackOutput`. Both work regardless of how deeply the component is nested.
+The preconnect appears in `<head>` and the script appears at end of `<body>`, both via `<Stack>` placeholder replacement. Both work regardless of how deeply the component is nested.
 
 ## Exports
 
 | Export Path | Contents |
 |---|---|
-| `astro-stacks` | `stacksMiddleware`, `createStackStore`, `renderStacks`, `renderStacksResponse`, `StackStore` type |
-| `astro-stacks/stack-output.astro` | `StackOutput` component |
+| `astro-stacks` | `createStackStore`, `renderStacks`, `renderStacksResponse`, `StackStore` type, integration default export |
+| `astro-stacks/stack.astro` | `Stack` component |
+| `astro-stacks/middleware` | Middleware (auto-registered by integration) |
