@@ -58,10 +58,13 @@ export function renderStacks(html: string, store: StackStore): string {
   return html.replace(STACK_PLACEHOLDER, (_, name) => store.get(name));
 }
 
+const NULL_BODY_STATUSES = new Set([101, 204, 205, 304]);
+
 export async function renderStacksResponse(
   response: Response,
   store: StackStore,
 ): Promise<Response> {
+  if (NULL_BODY_STATUSES.has(response.status)) return response;
   const type = response.headers.get("content-type");
   if (!type?.includes("text/html")) return response;
 
